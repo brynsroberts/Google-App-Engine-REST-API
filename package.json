@@ -1,0 +1,31 @@
+{
+  "name": "finalproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "devStart": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brynsroberts/cs493-finalproject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brynsroberts/cs493-finalproject/issues"
+  },
+  "homepage": "https://github.com/brynsroberts/cs493-finalproject#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "@google-cloud/datastore": "^6.4.0",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "google-auth-library": "^7.0.4",
+    "googleapis": "^73.0.0"
+  }
+}
