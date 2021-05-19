@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import "./App.css";
 
 function Home() {
@@ -7,10 +7,7 @@ function Home() {
       <Container>
         <Row>
           <Col className="center">
-            <h1>Landing Page CS493 - Final Project</h1>
-            <a href="http://localhost:8080/oauth">
-              <Button>Redirect to Google OAuth 2.0 Endpoint</Button>
-            </a>
+            <h1>Google App Engine REST API</h1>
           </Col>
         </Row>
       </Container>

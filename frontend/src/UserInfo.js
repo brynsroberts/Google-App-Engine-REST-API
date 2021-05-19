@@ -22,6 +22,7 @@ function UserInfo(props) {
 
   return (
     <div>
+      <br></br>
       <Container>
         <Row>
           <Col>
