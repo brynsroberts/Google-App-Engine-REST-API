@@ -69,4 +69,5 @@ const oauthRedirect = async (req, res, next) => {
 
 module.exports = {
   oauthRedirect,
+  getTokenID,
 };

@@ -1,8 +1,6 @@
 const express = require("express");
-
-const { oauthRedirect } = require("../controllers/login");
-
 const router = express.Router();
+const { oauthRedirect } = require("../controllers/login");
 
 router.get("/oauth", oauthRedirect);
 
