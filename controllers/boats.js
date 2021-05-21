@@ -7,21 +7,25 @@ const {
   deleteSingleBoat,
   removeBoatLoad,
 } = require("../models/boats");
-const { getAllUsers } = require("../models/users");
-const { patchSingleUser } = require("../models/users");
+const {
+  getSingleUser,
+  getAllUsers,
+  patchSingleUser,
+} = require("../models/users");
 const ApiError = require("../error/error");
 const {
   getSingleLoad,
   addLoadBoat,
   removeLoadBoat,
 } = require("../models/loads");
-const { validatePostReqBody } = require("./validation/boat");
+const { validatePostReqBody, validateGetReq } = require("./validation/boat");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
 const getBoats = async (req, res, next) => {
   if (Object.keys(req.query).includes("cursor")) {
     var cursor = req.query.cursor;
   }
+
   const boats = await getAllBoats(cursor);
   const formattedBoats = boats[0].map((boat) => {
     return {
@@ -54,17 +58,27 @@ const getBoats = async (req, res, next) => {
 };
 
 const getBoat = async (req, res, next) => {
-  const id = req.params.id;
-  const boat = await getSingleBoat(id);
-  if (boat[0] === undefined) {
-    next(ApiError.notFound("No boat with this boat_id exists"));
-    return;
-  }
+  // token cannot be undefined
+  if (!authorizationExists(req, next)) return;
+
+  // authorize token
+  const token_id = await verifyToken(req, next);
+  if (!token_id) return;
+
+  // authorize if accept header set
+  // authorize if boat in database
+  // authorize if boat belongs to owner
+  const valid_request = await validateGetReq(req, res, next, token_id);
+  if (!valid_request) return;
+
+  // get the boat from the datastore
+  const boat_id = req.params.boat_id;
+  const boat = await getSingleBoat(boat_id);
 
   res.status(200).json({
-    id: id,
+    id: boat_id,
     ...boat[0],
-    self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + id,
+    self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + boat_id,
   });
 };
 
@@ -81,7 +95,6 @@ const postBoat = async (req, res, next) => {
 
   // if JWT is valid and body is valid
   if (valid_body) {
-
     // get self URL from database and store in owner_self
     const users = await getAllUsers();
     let owner_self = "";

@@ -17,7 +17,7 @@ const getAllBoats = async (cursor) => {
 
 const getSingleBoat = async (id) => {
   const key = datastore.key([BOAT, parseInt(id, 10)]);
-  const boat = datastore.get(key);
+  const boat = datastore.get(key).catch(() => undefined);
   return boat;
 };
 

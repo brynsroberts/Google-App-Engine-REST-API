@@ -1,5 +1,6 @@
 const ApiError = require("../../error/error");
 const { getSingleBoat } = require("../../models/boats");
+const { getSingleUser } = require("../../models/users");
 
 const validateString = (input) => {
   // validate input is not empty
@@ -227,8 +228,7 @@ const validatePatchReq = async (req, res, next) => {
 };
 
 const validatePostReqBody = (req, res, next) => {
-  
-    // content type must be application/json
+  // content type must be application/json
   if (req.get("content-type") !== "application/json") {
     next(
       ApiError.unsupportedMediaType(
@@ -241,9 +241,7 @@ const validatePostReqBody = (req, res, next) => {
   // accept header must be set to application/json
   const accepts = req.accepts(["application/json"]);
   if (!accepts) {
-    next(
-      ApiError.notAcceptable("Accept header must be application/json if set")
-    );
+    next(ApiError.notAcceptable("Accept header must be application/json"));
     return false;
   }
 
@@ -302,23 +300,31 @@ const validateDeleteReq = async (req, res, next) => {
   return true;
 };
 
-const validateGetReq = async (req, res, next) => {
+const validateGetReq = async (req, res, next, token_id) => {
   // accept header must not be set or be set to application/json
-  const accepts = req.accepts(["text/html", "application/json"]);
+  const accepts = req.accepts("application/json");
   if (!accepts) {
-    next(
-      ApiError.notAcceptable(
-        "Accept header must be application/json or text/html"
-      )
-    );
+    next(ApiError.notAcceptable("Accept header must be application/json"));
     return false;
   }
 
   // if boat is not in databse - return error
-  const boat = await getSingleBoat(req.params.id);
-  if (boat[0] === undefined) {
+  const boat = await getSingleBoat(req.params.boat_id);
+  if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
     return false;
+  }
+
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
+      )
+    );
+    return;
   }
 
   // valid get boat request
