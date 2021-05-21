@@ -73,6 +73,7 @@ const getBoats = async (req, res, next) => {
     }
   });
 
+  // get total count for JWT user boats
   const boat_count = await getUserBoatCount(formattedBoats);
 
   // if more than 5 boats exist for user based on cursor
