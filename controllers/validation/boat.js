@@ -331,10 +331,32 @@ const validateGetReq = async (req, res, next, token_id) => {
   return true;
 };
 
+const validateGetAllBoatsReq = (req, res, next) => {
+  // accept header must not be set or be set to application/json
+  const accepts = req.accepts("application/json");
+  if (!accepts) {
+    next(ApiError.notAcceptable("Accept header must be application/json"));
+    return false;
+  }
+  return true;
+};
+
+const boatBelongsToOwner = async (boat, token_id) => {
+  // if boat does not belong to owner - return false
+  const owner_id = boat["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    return false;
+  }
+  return true;
+};
+
 module.exports = {
   validatePostReqBody,
   validatePutReq,
   validatePatchReq,
   validateDeleteReq,
   validateGetReq,
+  validateGetAllBoatsReq,
+  boatBelongsToOwner,
 };

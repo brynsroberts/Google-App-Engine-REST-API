@@ -18,31 +18,67 @@ const {
   addLoadBoat,
   removeLoadBoat,
 } = require("../models/loads");
-const { validatePostReqBody, validateGetReq } = require("./validation/boat");
+const {
+  validatePostReqBody,
+  validateGetReq,
+  validateGetAllBoatsReq,
+  boatBelongsToOwner,
+} = require("./validation/boat");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
+const getUserBoatCount = async (boats) => {
+  if (boats.length === 0) {
+    return 0;
+  }
+
+  const owner_id = boats[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  return owner[0]["boats"].length;
+};
+
 const getBoats = async (req, res, next) => {
+  // token cannot be undefined
+  if (!authorizationExists(req, next)) return;
+
+  // authorize token
+  const token_id = await verifyToken(req, next);
+  if (!token_id) return;
+
+  // authorize if accept header set
+  const req_valid = validateGetAllBoatsReq(req, res, next);
+  if (!req_valid) return;
+
+  // for pagination - cursor will exist more than 5 results are left in the datastore
   if (Object.keys(req.query).includes("cursor")) {
     var cursor = req.query.cursor;
   }
 
+  // get all boats from datastore
   const boats = await getAllBoats(cursor);
+
+  // get boats that belong to JTW owner and format boat for return
   const formattedBoats = boats[0].map((boat) => {
-    return {
-      id: boat[Datastore.KEY].id,
-      ...boat,
-      self:
-        req.protocol +
-        "://" +
-        req.get("host") +
-        req.baseUrl +
-        "/" +
-        boat[Datastore.KEY].id,
-    };
+    if (boatBelongsToOwner(boat, token_id)) {
+      return {
+        id: boat[Datastore.KEY].id,
+        ...boat,
+        self:
+          req.protocol +
+          "://" +
+          req.get("host") +
+          req.baseUrl +
+          "/" +
+          boat[Datastore.KEY].id,
+      };
+    }
   });
 
+  const boat_count = await getUserBoatCount(formattedBoats);
+
+  // if more than 5 boats exist for user based on cursor
   if (boats[1].moreResults !== Datastore.NO_MORE_RESULTS) {
     res.status(200).json({
+      owner_boat_count: boat_count,
       items: formattedBoats,
       next:
         req.protocol +
@@ -52,8 +88,12 @@ const getBoats = async (req, res, next) => {
         "?cursor=" +
         boats[1].endCursor,
     });
+
+    // less than 5 boats based on cursor
   } else {
-    res.status(200).json({ items: formattedBoats });
+    res
+      .status(200)
+      .json({ owner_boat_count: boat_count, items: formattedBoats });
   }
 };
 
@@ -75,6 +115,7 @@ const getBoat = async (req, res, next) => {
   const boat_id = req.params.boat_id;
   const boat = await getSingleBoat(boat_id);
 
+  // return JSON object of boat
   res.status(200).json({
     id: boat_id,
     ...boat[0],
