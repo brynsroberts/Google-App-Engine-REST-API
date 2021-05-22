@@ -15,12 +15,16 @@ const getTokenID = async (token) => {
   return userid;
 };
 
-const postUserToDatabase = async (tokens) => {
+const postUserToDatabase = async (tokens, req) => {
   // get all user tokens
   const existing_users = await axios.get("http://localhost:8080/users");
 
   // determine if token already is in the database
   const token_id = await getTokenID(tokens.id_token);
+
+  // add token_id to session
+  req.session.id_user = token_id;
+
   let token_already_exists = false;
   for (const user of existing_users.data) {
     if (user.token_id === token_id) {
@@ -58,12 +62,13 @@ const oauthRedirect = async (req, res, next) => {
   // get token from JWT
   const { tokens } = await oauth2Client.getToken(req.query.code);
   oauth2Client.setCredentials(tokens);
+  req.session.id_token = tokens.id_token;
 
   // if user is not in database already - post user to database
-  await postUserToDatabase(tokens);
+  await postUserToDatabase(tokens, req);
 
   // redirect to UserInfo page with id_token in params
-  const redirect_url = "http://localhost:3000/UserInfo/" + tokens.id_token;
+  const redirect_url = "http://localhost:8080/UserInfo/";
   res.redirect(redirect_url);
 };
 

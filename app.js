@@ -23,7 +23,7 @@ app.use(
     saveUninitialized: false,
   })
 );
-// app.use(express.static(path.join(__dirname, "./front-end/build")));
+app.use(express.static(path.join(__dirname, "./frontend/build")));
 
 // app routes
 app.use("/users", userRoutes);
@@ -31,9 +31,9 @@ app.use("/boats", boatRoutes);
 app.use("/loads", loadRoutes);
 app.use("/", loginRoutes);
 
-// app.get("/*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "./front-end/build/index.html"));
-// });
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
+});
 
 // app error handling middleware
 app.use(errorHandler);

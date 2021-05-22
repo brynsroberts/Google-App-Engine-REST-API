@@ -1,24 +1,27 @@
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { useParams } from "react-router-dom";
-// import axios from "axios";
+// import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import "./App.css";
 
 function UserInfo(props) {
-  // const [id_token, setIdToken] = useState("");
+  const [id_token, setIdToken] = useState("");
+  const [id_user, setIDUser] = useState("");
 
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:8080/user")
-  //     .then((res) => {
-  //       setIdToken(res.data.id_token);
-  //       console.log(res.data.id_token);
-  //     })
-  //     .catch((err) => {
-  //       console.log("err");
-  //     });
-  // }, []);
-
-  let { token_id } = useParams();
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/users/token/info")
+      .then((res) => {
+        console.log(res);
+        setIdToken(res.data.id_token);
+        console.log(res.data.id_token);
+        setIDUser(res.data.id_user);
+        console.log(res.data.id_user);
+      })
+      .catch((err) => {
+        console.log("err");
+      });
+  }, []);
 
   return (
     <div>
@@ -27,10 +30,22 @@ function UserInfo(props) {
         <Row>
           <Col>
             <Card>
-              <Card.Header>JWT</Card.Header>
+              <Card.Header>JWT Bearer Token</Card.Header>
               <Card.Body>
-                <Card.Title>Bearer Token</Card.Title>
-                <Card.Text>{token_id}</Card.Text>
+                <Card.Text>{id_token}</Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+      <br></br>
+      <Container>
+        <Row>
+          <Col>
+            <Card>
+              <Card.Header>User ID</Card.Header>
+              <Card.Body>
+                <Card.Text>{id_user}</Card.Text>
               </Card.Body>
             </Card>
           </Col>

@@ -23,7 +23,7 @@ const getUser = async (req, res, next) => {
   const user = await getSingleUser(req.params.user_id);
 
   // if user does not exist in datastore - return error
-  if (user[0] === undefined) {
+  if (user === undefined || user[0] === undefined) {
     next(ApiError.notFound("No user with this user_id exists"));
     return;
   }
@@ -43,7 +43,15 @@ const getUser = async (req, res, next) => {
   res.status(200).json(formattedUsers);
 };
 
+const getTokenInfo = (req, res, next) => {
+  res.status(200).json({
+    id_token: req.session.id_token,
+    id_user: req.session.id_user,
+  });
+};
+
 module.exports = {
   getUser,
   getUsers,
+  getTokenInfo,
 };

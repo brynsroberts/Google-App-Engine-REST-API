@@ -12,7 +12,7 @@ function App() {
         <Nav />
         <Switch>
           {<Route path="/" exact render={() => <Home />} />}
-          <Route path="/UserInfo/:token_id" children={<UserInfo />} />
+          <Route path="/UserInfo" children={<UserInfo />} />
         </Switch>
         <Footer />
       </div>
