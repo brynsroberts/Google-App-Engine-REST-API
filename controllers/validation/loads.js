@@ -4,6 +4,7 @@ const {
   validateLength,
   validateDate,
 } = require("./validation");
+const { getSingleLoad } = require("../../models/loads");
 
 const validatePostReqBody = (req, res, next) => {
   // content type must be application/json
@@ -58,4 +59,23 @@ const validatePostReqBody = (req, res, next) => {
   return true;
 };
 
-module.exports = { validatePostReqBody };
+const validateGetReq = async (req, res, next) => {
+  // accept header must not be set or be set to application/json
+  const accepts = req.accepts("application/json");
+  if (!accepts) {
+    next(ApiError.notAcceptable("Accept header must be application/json"));
+    return false;
+  }
+
+  // if load is not in databse - return error
+  const load = await getSingleLoad(req.params.load_id);
+  if (load === undefined || load[0] === undefined) {
+    next(ApiError.notFound("No load with this load_id exists"));
+    return false;
+  }
+
+  // valid get boat request
+  return true;
+};
+
+module.exports = { validatePostReqBody, validateGetReq };

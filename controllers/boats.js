@@ -127,6 +127,7 @@ const getBoat = async (req, res, next) => {
 const postBoat = async (req, res, next) => {
   // validate request body
   const valid_body = validatePostReqBody(req, res, next);
+  if (!valid_body) return;
 
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
@@ -136,47 +137,46 @@ const postBoat = async (req, res, next) => {
   if (!token_id) return;
 
   // if JWT is valid and body is valid
-  if (valid_body) {
-    // get self URL from database and store in owner_self
-    const users = await getAllUsers();
-    let owner_self = "";
-    let user_id;
-    for (const user of users) {
-      if (user.token_id === token_id) {
-        // update owner_self to include user id
-        owner_self =
-          req.protocol +
-          "://" +
-          req.get("host") +
-          "/users/" +
-          user[Datastore.KEY].id;
 
-        // set user_id
-        user_id = user[Datastore.KEY].id;
-        break;
-      }
+  // get self URL from database and store in owner_self
+  const users = await getAllUsers();
+  let owner_self = "";
+  let user_id;
+  for (const user of users) {
+    if (user.token_id === token_id) {
+      // update owner_self to include user id
+      owner_self =
+        req.protocol +
+        "://" +
+        req.get("host") +
+        "/users/" +
+        user[Datastore.KEY].id;
+
+      // set user_id
+      user_id = user[Datastore.KEY].id;
+      break;
     }
-
-    // post new boat to datastore
-    const { name, type, length } = req.body;
-    const key = await postSingleBoat(name, type, length, owner_self);
-
-    // add boat to user datastore
-    const boat_self =
-      req.protocol + "://" + req.get("host") + req.baseUrl + "/" + key.id;
-    await patchSingleUser(user_id, boat_self);
-
-    // return JSON object of posted boat
-    res.status(201).json({
-      id: key.id,
-      name: name,
-      type: type,
-      length: length,
-      owner: owner_self,
-      loads: [],
-      self: boat_self,
-    });
   }
+
+  // post new boat to datastore
+  const { name, type, length } = req.body;
+  const key = await postSingleBoat(name, type, length, owner_self);
+
+  // add boat to user datastore
+  const boat_self =
+    req.protocol + "://" + req.get("host") + req.baseUrl + "/" + key.id;
+  await patchSingleUser(user_id, boat_self);
+
+  // return JSON object of posted boat
+  res.status(201).json({
+    id: key.id,
+    name: name,
+    type: type,
+    length: length,
+    owner: owner_self,
+    loads: [],
+    self: boat_self,
+  });
 };
 
 const deleteBoat = async (req, res, next) => {

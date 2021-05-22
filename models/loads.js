@@ -6,7 +6,7 @@ const LOAD = "Load";
 
 const getSingleLoad = async (id) => {
   const key = datastore.key([LOAD, parseInt(id, 10)]);
-  const load = datastore.get(key).catch(() => undefined);;
+  const load = datastore.get(key).catch(() => undefined);
   return load;
 };
 
@@ -70,6 +70,12 @@ const deleteSingleLoad = async (load_id) => {
   return;
 };
 
+const getLoadCount = async () => {
+  const query = datastore.createQuery(LOAD);
+  const entities = await datastore.runQuery(query);
+  return entities[0].length;
+};
+
 module.exports = {
   getSingleLoad,
   getAllLoads,
@@ -77,4 +83,5 @@ module.exports = {
   addLoadBoat,
   removeLoadBoat,
   deleteSingleLoad,
+  getLoadCount,
 };

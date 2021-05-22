@@ -4,29 +4,34 @@ const {
   getAllLoads,
   postSingleLoad,
   deleteSingleLoad,
+  getLoadCount,
 } = require("../models/loads");
 const ApiError = require("../error/error");
 const { removeBoatLoad } = require("../models/boats");
-const { validatePostReqBody } = require("./validation/loads");
+const { validatePostReqBody, validateGetReq } = require("./validation/loads");
 
 const getLoad = async (req, res, next) => {
-  const id = req.params.id;
-  const load = await getSingleLoad(id);
-  if (load[0] === undefined) {
-    next(ApiError.notFound("No load with this load_id exists"));
-    return;
-  }
+  // validate request
+  const valid_req = await validateGetReq(req, res, next);
+  if (!valid_req) return;
+
+  // get load from return datastore and return JSON
+  const load_id = req.params.load_id;
+  const load = await getSingleLoad(load_id);
   res.status(200).json({
-    id: id,
+    id: load_id,
     ...load[0],
-    self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + id,
+    self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + load_id,
   });
 };
 
 const getLoads = async (req, res, next) => {
+  // for pagination - cursor will exist more than 5 results are left in the datastore
   if (Object.keys(req.query).includes("cursor")) {
     var cursor = req.query.cursor;
   }
+
+  // get all loads and format loads for return
   const loads = await getAllLoads(cursor);
   const formattedLoads = loads[0].map((load) => {
     return {
@@ -42,8 +47,13 @@ const getLoads = async (req, res, next) => {
     };
   });
 
+  // get total count of loads
+  const load_count = await getLoadCount();
+
+  // if more than 5 loads past cursor - return paginated result
   if (loads[1].moreResults !== Datastore.NO_MORE_RESULTS) {
     res.status(200).json({
+      total_load_count: load_count,
       items: formattedLoads,
       next:
         req.protocol +
@@ -53,16 +63,21 @@ const getLoads = async (req, res, next) => {
         "?cursor=" +
         loads[1].endCursor,
     });
+
+    // less than or equal to 5 loads - no need to paginate results
   } else {
-    res.status(200).json({ items: formattedLoads });
+    res
+      .status(200)
+      .json({ total_load_count: load_count, items: formattedLoads });
   }
 };
 
 const postLoad = async (req, res, next) => {
   // validate request body
-  const valid_body = validatePostReqBody(req, res, next);
-  if (!valid_body) return;
+  const valid_req = validatePostReqBody(req, res, next);
+  if (!valid_req) return;
 
+  // post load to datastore and return JSON
   const { volume, content, creation_date } = req.body;
   const key = await postSingleLoad(volume, content, creation_date);
   res.status(201).json({

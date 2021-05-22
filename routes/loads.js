@@ -8,8 +8,8 @@ const {
 } = require("../controllers/loads");
 
 router.get("/", getLoads);
-router.get("/:id", getLoad);
+router.get("/:load_id", getLoad);
 router.post("/", postLoad);
-router.delete("/:id", deleteLoad);
+router.delete("/:load_id", deleteLoad);
 
 module.exports = router;
