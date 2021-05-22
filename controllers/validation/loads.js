@@ -78,4 +78,31 @@ const validateGetReq = async (req, res, next) => {
   return true;
 };
 
-module.exports = { validatePostReqBody, validateGetReq };
+const validateGetAllReq = async (req, res, next) => {
+  // accept header must not be set or be set to application/json
+  const accepts = req.accepts("application/json");
+  if (!accepts) {
+    next(ApiError.notAcceptable("Accept header must be application/json"));
+    return false;
+  }
+
+  return true;
+};
+
+const validateDeleteReq = async (req, res, next) => {
+  // if load does not exist - return error
+  const load = await getSingleLoad(req.params.load_id);
+  if (load === undefined || load[0] === undefined) {
+    next(ApiError.notFound("No load with this load_id exists"));
+    return false;
+  }
+
+  return true;
+};
+
+module.exports = {
+  validatePostReqBody,
+  validateGetReq,
+  validateDeleteReq,
+  validateGetAllReq,
+};

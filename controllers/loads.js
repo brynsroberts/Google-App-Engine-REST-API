@@ -8,7 +8,12 @@ const {
 } = require("../models/loads");
 const ApiError = require("../error/error");
 const { removeBoatLoad } = require("../models/boats");
-const { validatePostReqBody, validateGetReq } = require("./validation/loads");
+const {
+  validatePostReqBody,
+  validateGetReq,
+  validateDeleteReq,
+  validateGetAllReq,
+} = require("./validation/loads");
 
 const getLoad = async (req, res, next) => {
   // validate request
@@ -26,6 +31,10 @@ const getLoad = async (req, res, next) => {
 };
 
 const getLoads = async (req, res, next) => {
+  // validate request
+  const valid_req = await validateGetAllReq(req, res, next);
+  if (!valid_req) return;
+
   // for pagination - cursor will exist more than 5 results are left in the datastore
   if (Object.keys(req.query).includes("cursor")) {
     var cursor = req.query.cursor;
@@ -91,18 +100,19 @@ const postLoad = async (req, res, next) => {
 };
 
 const deleteLoad = async (req, res, next) => {
-  const load_id = req.params.id;
-  const load = await getSingleLoad(load_id);
-  if (load[0] === undefined) {
-    next(ApiError.notFound("No load with this load_id exists"));
-    return;
-  }
+  // determine if request is valid
+  const valid_req = await validateDeleteReq(req, res, next);
+  if (!valid_req) return;
 
+  // if load is on a boat - delete load from boat
+  const load_id = req.params.load_id;
+  const load = await getSingleLoad(load_id);
   const boat_id = load[0]["carrier"]["id"];
   if (boat_id !== null) {
     await removeBoatLoad(boat_id, load_id);
   }
 
+  // delete load from datastore
   await deleteSingleLoad(load_id);
   res.status(204).end();
 };

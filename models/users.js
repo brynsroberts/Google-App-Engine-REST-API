@@ -43,7 +43,7 @@ const removeSingleBoat = async (user_id, boat_id) => {
       return boat;
     }
   });
-  user[0].boats = boat_list;
+  user[0].boats = [...boat_list];
 
   // save user in datastore
   await datastore.save({ key: key, data: user[0] });
