@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors");
+// const cors = require("cors");
 const path = require("path");
 const session = require("express-session");
 const errorHandler = require("./error/error-handler");
@@ -14,7 +14,7 @@ const loadRoutes = require("./routes/loads");
 // set up app
 const app = express();
 app.enable("trust proxy");
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(
   session({

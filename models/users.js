@@ -12,7 +12,7 @@ const getAllUsers = async () => {
 
 const getSingleUser = async (id) => {
   const key = datastore.key([USER, parseInt(id, 10)]);
-  const user = datastore.get(key).catch(() => undefined);;
+  const user = datastore.get(key).catch(() => undefined);
   return user;
 };
 
@@ -31,9 +31,28 @@ const patchSingleUser = async (id, boat_self) => {
   return key;
 };
 
+const removeSingleBoat = async (user_id, boat_id) => {
+  // get user
+  const key = datastore.key([USER, parseInt(user_id, 10)]);
+  let user = await getSingleUser(user_id);
+
+  // remove boat_id from user boats
+  const boat_list = user[0].boats.filter((boat) => {
+    const this_boat_id = boat.split("/").pop();
+    if (this_boat_id !== boat_id) {
+      return boat;
+    }
+  });
+  user[0].boats = boat_list;
+
+  // save user in datastore
+  await datastore.save({ key: key, data: user[0] });
+};
+
 module.exports = {
   getAllUsers,
   getSingleUser,
   postSingleUser,
   patchSingleUser,
+  removeSingleBoat,
 };

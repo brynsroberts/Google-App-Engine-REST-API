@@ -80,14 +80,6 @@ const removeBoatLoad = async (boat_id, load_id) => {
 
 const deleteSingleBoat = async (boat_id) => {
   const key = datastore.key([BOAT, parseInt(boat_id, 10)]);
-  const boat = await getSingleBoat(boat_id);
-  const { loads } = boat[0];
-
-  loads.forEach(async (load) => {
-    const load_id = load["id"];
-    await removeLoadBoat(load_id);
-  });
-
   await datastore.delete(key);
   return;
 };

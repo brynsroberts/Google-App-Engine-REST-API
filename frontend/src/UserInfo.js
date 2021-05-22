@@ -1,5 +1,4 @@
 import { Container, Row, Col, Card } from "react-bootstrap";
-// import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
@@ -12,14 +11,11 @@ function UserInfo(props) {
     axios
       .get("http://localhost:8080/users/token/info")
       .then((res) => {
-        console.log(res);
         setIdToken(res.data.id_token);
-        console.log(res.data.id_token);
         setIDUser(res.data.id_user);
-        console.log(res.data.id_user);
       })
-      .catch((err) => {
-        console.log("err");
+      .catch(() => {
+        console.log("error");
       });
   }, []);
 

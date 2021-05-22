@@ -14,7 +14,7 @@ router.get("/", getBoats);
 router.get("/:boat_id", getBoat);
 router.put("/:boat_id/loads/:load_id", assignLoadToBoat);
 router.post("/", postBoat);
-router.delete("/:id", deleteBoat);
+router.delete("/:boat_id", deleteBoat);
 router.delete("/:boat_id/loads/:load_id", removeLoadFromBoat);
 
 module.exports = router;
