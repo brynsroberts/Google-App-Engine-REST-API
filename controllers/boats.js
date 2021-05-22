@@ -23,7 +23,7 @@ const {
   validateGetReq,
   validateGetAllBoatsReq,
   boatBelongsToOwner,
-} = require("./validation/boat");
+} = require("./validation/boats");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
 const getUserBoatCount = async (boats) => {

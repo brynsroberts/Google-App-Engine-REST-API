@@ -5,9 +5,9 @@ const {
   postSingleLoad,
   deleteSingleLoad,
 } = require("../models/loads");
-
 const ApiError = require("../error/error");
 const { removeBoatLoad } = require("../models/boats");
+const { validatePostReqBody } = require("./validation/loads");
 
 const getLoad = async (req, res, next) => {
   const id = req.params.id;
@@ -59,16 +59,11 @@ const getLoads = async (req, res, next) => {
 };
 
 const postLoad = async (req, res, next) => {
-  const { volume, content, creation_date } = req.body;
-  if (!volume || !content || !creation_date) {
-    next(
-      ApiError.badRequest(
-        "The request object is missing at least one of the required attributes"
-      )
-    );
-    return;
-  }
+  // validate request body
+  const valid_body = validatePostReqBody(req, res, next);
+  if (!valid_body) return;
 
+  const { volume, content, creation_date } = req.body;
   const key = await postSingleLoad(volume, content, creation_date);
   res.status(201).json({
     id: key.id,

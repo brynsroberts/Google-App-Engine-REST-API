@@ -12,7 +12,7 @@ const getAllUsers = async () => {
 
 const getSingleUser = async (id) => {
   const key = datastore.key([USER, parseInt(id, 10)]);
-  const user = datastore.get(key);
+  const user = datastore.get(key).catch(() => undefined);;
   return user;
 };
 

@@ -359,4 +359,6 @@ module.exports = {
   validateGetReq,
   validateGetAllBoatsReq,
   boatBelongsToOwner,
+  validateString,
+  validateLength,
 };

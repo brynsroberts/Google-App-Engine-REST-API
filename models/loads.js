@@ -6,7 +6,7 @@ const LOAD = "Load";
 
 const getSingleLoad = async (id) => {
   const key = datastore.key([LOAD, parseInt(id, 10)]);
-  const load = datastore.get(key);
+  const load = datastore.get(key).catch(() => undefined);;
   return load;
 };
 
