@@ -226,19 +226,11 @@ const validatePostReqBody = (req, res, next) => {
 
 const validateDeleteReq = async (req, res, next) => {
   // if boat is not in database - return error
-  const boat = await getSingleBoat(req.params.id);
-  if (boat[0] === undefined) {
+  const boat = await getSingleBoat(req.params.boat_id);
+  if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
     return false;
   }
-
-  // remove boat name from currBoatNames array
-  let newList = currBoatNames.filter((name) => {
-    if (name !== boat[0]["name"]) {
-      return name;
-    }
-  });
-  currBoatNames = [...newList];
 
   // valid delete boat request
   return true;

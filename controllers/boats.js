@@ -26,6 +26,7 @@ const {
   boatBelongsToOwner,
   validatedLoadBoat,
   validatedRemoveBoatLoad,
+  validateDeleteReq,
 } = require("./validation/boats");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
@@ -181,12 +182,9 @@ const postBoat = async (req, res, next) => {
 };
 
 const deleteBoat = async (req, res, next) => {
-  const boat_id = req.params.boat_id;
-  const boat = await getSingleBoat(boat_id);
-  if (boat[0] === undefined) {
-    next(ApiError.notFound("No boat with this boat_id exists"));
-    return;
-  }
+  // validate request
+  const valid_req = await validateDeleteReq(req, res, next);
+  if (!valid_req) return;
 
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
@@ -195,8 +193,11 @@ const deleteBoat = async (req, res, next) => {
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
 
+  // get boat id from params
+  const boat_id = req.params.boat_id;
+
   // remove each of the loads from the boat
-  // const boat = await getSingleBoat(boat_id);
+  const boat = await getSingleBoat(boat_id);
   const { loads } = boat[0];
   loads.forEach(async (load) => {
     const load_id = load["id"];
