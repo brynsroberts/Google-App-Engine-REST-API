@@ -23,6 +23,8 @@ const {
   validateGetReq,
   validateGetAllBoatsReq,
   boatBelongsToOwner,
+  validatedLoadBoat,
+  validatedRemoveBoatLoad,
 } = require("./validation/boats");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
@@ -136,8 +138,6 @@ const postBoat = async (req, res, next) => {
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
 
-  // if JWT is valid and body is valid
-
   // get self URL from database and store in owner_self
   const users = await getAllUsers();
   let owner_self = "";
@@ -193,29 +193,28 @@ const deleteBoat = async (req, res, next) => {
 };
 
 const assignLoadToBoat = async (req, res, next) => {
-  const boat_id = req.params.boat_id;
-  const boat = await getSingleBoat(boat_id);
-  if (boat[0] === undefined) {
-    next(ApiError.notFound("The specified boat and/or load does not exist"));
-    return;
-  }
+  // validate request
+  const valid_req = await validatedLoadBoat(req, next);
+  if (!valid_req) return;
 
+  // token cannot be undefined
+  if (!authorizationExists(req, next)) return;
+
+  // authorize token
+  const token_id = await verifyToken(req, next);
+  if (!token_id) return;
+
+  // extract parameters from url
   const load_id = req.params.load_id;
-  const load = await getSingleLoad(load_id);
-  if (load[0] === undefined) {
-    next(ApiError.notFound("The specified boat and/or load does not exist"));
-    return;
-  }
+  const boat_id = req.params.boat_id;
 
-  if (load[0]["carrier"]["name"] !== null) {
-    next(ApiError.forbidden("The load is already assigned to another boat"));
-    return;
-  }
-
+  // add the boat to the load
   const load_self_url =
     req.protocol + "://" + req.get("host") + "/loads/" + load_id;
   await addBoatLoad(boat_id, load_id, load_self_url);
 
+  // add the load to the boat
+  const boat = await getSingleBoat(boat_id);
   const boat_self_url =
     req.protocol + "://" + req.get("host") + req.baseUrl + "/" + boat_id;
   const boat_name = boat[0]["name"];
@@ -224,37 +223,22 @@ const assignLoadToBoat = async (req, res, next) => {
 };
 
 const removeLoadFromBoat = async (req, res, next) => {
+  // validate request
+  const valid_req = await validatedRemoveBoatLoad(req, next);
+  if (!valid_req) return;
+
+  // token cannot be undefined
+  if (!authorizationExists(req, next)) return;
+
+  // authorize token
+  const token_id = await verifyToken(req, next);
+  if (!token_id) return;
+
+  // extract parameters from url
   const boat_id = req.params.boat_id;
-  const boat = await getSingleBoat(boat_id);
-  if (boat[0] === undefined) {
-    next(
-      ApiError.notFound(
-        "No boat with this boat_id has a load with this load_id"
-      )
-    );
-    return;
-  }
-
   const load_id = req.params.load_id;
-  const load = await getSingleLoad(load_id);
-  if (load[0] === undefined) {
-    next(
-      ApiError.notFound(
-        "No boat with this boat_id has a load with this load_id"
-      )
-    );
-    return;
-  }
 
-  if (load[0]["carrier"]["id"] !== boat_id) {
-    next(
-      ApiError.notFound(
-        "No boat with this boat_id has a load with this load_id"
-      )
-    );
-    return;
-  }
-
+  // remove boat from load
   await removeBoatLoad(boat_id, load_id);
   await removeLoadBoat(load_id);
   res.status(204).end();

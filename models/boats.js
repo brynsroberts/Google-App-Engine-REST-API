@@ -37,7 +37,7 @@ const postSingleBoat = async (name, type, length, owner_self) => {
 const addBoatLoad = async (boat_id, load_id, load_self_url) => {
   const key = datastore.key([BOAT, parseInt(boat_id, 10)]);
   const boat = await getSingleBoat(boat_id);
-  const { name, type, length, loads } = boat[0];
+  const { name, type, length, loads, owner } = boat[0];
   let load_already_in_boat = false;
   for (const load of loads) {
     if (load["id"] === load_id) {
@@ -52,17 +52,29 @@ const addBoatLoad = async (boat_id, load_id, load_self_url) => {
       self: load_self_url,
     });
   }
-  const newBoat = { name: name, type: type, length: length, loads: loads };
+  const newBoat = {
+    name: name,
+    type: type,
+    length: length,
+    owner: owner,
+    loads: loads,
+  };
   await datastore.save({ key: key, data: newBoat });
 };
 
 const removeBoatLoad = async (boat_id, load_id) => {
   const key = datastore.key([BOAT, parseInt(boat_id, 10)]);
   const boat = await getSingleBoat(boat_id);
-  const { name, type, length, loads } = boat[0];
+  const { name, type, length, loads, owner } = boat[0];
   const newLoads = loads.filter((load) => load["id"] !== load_id);
 
-  const newBoat = { name: name, type: type, length: length, loads: newLoads };
+  const newBoat = {
+    name: name,
+    type: type,
+    length: length,
+    owner: owner,
+    loads: newLoads,
+  };
   await datastore.save({ key: key, data: newBoat });
 };
 

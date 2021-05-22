@@ -1,6 +1,7 @@
 const ApiError = require("../../error/error");
 const { getSingleBoat } = require("../../models/boats");
 const { getSingleUser } = require("../../models/users");
+const { getSingleLoad } = require("../../models/loads");
 const { validateString, validateLength } = require("./validation");
 
 // const validateString = (input) => {
@@ -352,6 +353,70 @@ const boatBelongsToOwner = async (boat, token_id) => {
   return true;
 };
 
+const validatedLoadBoat = async (req, next) => {
+  // if boat does not exist - return error
+  const boat_id = req.params.boat_id;
+  const boat = await getSingleBoat(boat_id);
+  if (boat === undefined || boat[0] === undefined) {
+    next(ApiError.notFound("The specified boat and/or load does not exist"));
+    return false;
+  }
+
+  // if load does not exist - return error
+  const load_id = req.params.load_id;
+  const load = await getSingleLoad(load_id);
+  if (load === undefined || load[0] === undefined) {
+    next(ApiError.notFound("The specified boat and/or load does not exist"));
+    return false;
+  }
+
+  // if load is already on a boat - return error
+  if (load[0]["carrier"]["name"] !== null) {
+    next(ApiError.forbidden("The load is already assigned to another boat"));
+    return false;
+  }
+
+  return true;
+};
+
+const validatedRemoveBoatLoad = async (req, next) => {
+  // if boat does not exist - return error
+  const boat_id = req.params.boat_id;
+  const boat = await getSingleBoat(boat_id);
+  if (boat[0] === undefined) {
+    next(
+      ApiError.notFound(
+        "No boat with this boat_id has a load with this load_id"
+      )
+    );
+    return false;
+  }
+
+  // if load does not exist - return error
+  const load_id = req.params.load_id;
+  const load = await getSingleLoad(load_id);
+  if (load[0] === undefined) {
+    next(
+      ApiError.notFound(
+        "No boat with this boat_id has a load with this load_id"
+      )
+    );
+    return false;
+  }
+
+  // if the boat does not have the load on it - return error
+  if (load[0]["carrier"]["id"] !== boat_id) {
+    next(
+      ApiError.notFound(
+        "No boat with this boat_id has a load with this load_id"
+      )
+    );
+    return false;
+  }
+
+  return true;
+};
+
 module.exports = {
   validatePostReqBody,
   validatePutReq,
@@ -362,4 +427,6 @@ module.exports = {
   boatBelongsToOwner,
   validateString,
   validateLength,
+  validatedLoadBoat,
+  validatedRemoveBoatLoad,
 };
