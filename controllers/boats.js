@@ -296,8 +296,8 @@ const putBoat = async (req, res, next) => {
   );
 
   const put_boat = await getSingleBoat(req.params.boat_id);
-  // send back 303 reponse with application/json
-  res.status(303).json({
+  // send back 200 reponse with application/json
+  res.status(200).json({
     id: key.id,
     ...put_boat[0],
     self:

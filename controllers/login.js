@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 const axios = require("axios").default;
-const { postSingleUser } = require("../models/users");
+const { postSingleUser, getAllUsers } = require("../models/users");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.CLIENT_ID);
 
@@ -17,7 +17,7 @@ const getTokenID = async (token) => {
 
 const postUserToDatabase = async (tokens, req) => {
   // get all user tokens
-  const existing_users = await axios.get("http://localhost:8080/users");
+  const existing_users = await getAllUsers();
 
   // determine if token already is in the database
   const token_id = await getTokenID(tokens.id_token);
@@ -27,7 +27,7 @@ const postUserToDatabase = async (tokens, req) => {
 
   // if token already in datastore - don't add user again
   let token_already_exists = false;
-  for (const user of existing_users.data.items) {
+  for (const user of existing_users) {
     if (user.token_id === token_id) {
       token_already_exists = true;
       break;

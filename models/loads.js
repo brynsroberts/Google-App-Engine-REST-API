@@ -76,6 +76,20 @@ const getLoadCount = async () => {
   return entities[0].length;
 };
 
+const putSingleLoad = async (volume, content, creation_date, load_id) => {
+  const key = datastore.key([LOAD, parseInt(load_id, 10)]);
+  const prev_load = await getSingleLoad(load_id);
+  const { carrier } = prev_load[0];
+  const new_load = {
+    volume: volume,
+    content: content,
+    creation_date: creation_date,
+    carrier: carrier,
+  };
+  await datastore.save({ key: key, data: new_load });
+  return key;
+};
+
 module.exports = {
   getSingleLoad,
   getAllLoads,
@@ -84,4 +98,5 @@ module.exports = {
   removeLoadBoat,
   deleteSingleLoad,
   getLoadCount,
+  putSingleLoad,
 };

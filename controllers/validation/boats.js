@@ -127,7 +127,7 @@ const validatePatchReq = async (req, res, next) => {
     return false;
   }
 
-  // valid post request
+  // valid patch request
   return true;
 };
 

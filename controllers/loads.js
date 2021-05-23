@@ -5,6 +5,7 @@ const {
   postSingleLoad,
   deleteSingleLoad,
   getLoadCount,
+  putSingleLoad,
 } = require("../models/loads");
 const ApiError = require("../error/error");
 const { removeBoatLoad } = require("../models/boats");
@@ -13,6 +14,8 @@ const {
   validateGetReq,
   validateDeleteReq,
   validateGetAllReq,
+  validatePutReq,
+  validatePatchReq,
 } = require("./validation/loads");
 
 const getLoad = async (req, res, next) => {
@@ -117,4 +120,97 @@ const deleteLoad = async (req, res, next) => {
   res.status(204).end();
 };
 
-module.exports = { getLoads, getLoad, postLoad, deleteLoad };
+const putLoad = async (req, res, next) => {
+  // validate request
+  const req_valid = await validatePutReq(req, res, next);
+  if (!req_valid) return;
+
+  // update load in database
+  const { volume, content, creation_date } = req.body;
+  const key = await putSingleLoad(
+    volume,
+    content,
+    creation_date,
+    req.params.load_id
+  );
+
+  // add self attribute to location header
+  res.location(
+    req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "/" +
+      req.params.load_id
+  );
+
+  const put_load = await getSingleLoad(req.params.load_id);
+  // send back 200 reponse with application/json
+  res.status(200).json({
+    id: req.params.load_id,
+    ...put_load[0],
+    self:
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "/" +
+      req.params.load_id,
+  });
+};
+
+const patchLoad = async (req, res, next) => {
+  // validate request
+  const req_valid = await validatePatchReq(req, res, next);
+  if (!req_valid) return;
+
+  // update load in database
+  const load = await getSingleLoad(req.params.load_id);
+  let { volume, content, creation_date } = req.body;
+
+  // update variable to hold new user input or old values already stored in boat
+  if (!volume) {
+    volume = load[0]["volume"];
+  }
+
+  if (!content) {
+    content = load[0]["content"];
+  }
+
+  if (!creation_date) {
+    creation_date = load[0]["creation_date"];
+  }
+
+  // path boat with new values
+  const key = await putSingleLoad(
+    volume,
+    content,
+    creation_date,
+    req.params.load_id
+  );
+
+  // send back 200 reponse with application/json
+  res.status(200).json({
+    id: req.params.load_id,
+    volume: volume,
+    content: content,
+    creation_date: creation_date,
+    carrier: load[0].carrier,
+    self:
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "/" +
+      req.params.load_id,
+  });
+};
+
+module.exports = {
+  getLoads,
+  getLoad,
+  postLoad,
+  deleteLoad,
+  putLoad,
+  patchLoad,
+};
