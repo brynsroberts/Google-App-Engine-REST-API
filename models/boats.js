@@ -84,6 +84,21 @@ const deleteSingleBoat = async (boat_id) => {
   return;
 };
 
+const putSingleBoat = async (name, type, length, boat_id) => {
+  const key = datastore.key([BOAT, parseInt(boat_id, 10)]);
+  const prev_boat = await getSingleBoat(boat_id);
+  const { owner, loads } = prev_boat[0];
+  const newBoat = {
+    name: name,
+    type: type,
+    length: length,
+    owner: owner,
+    loads: loads,
+  };
+  await datastore.save({ key: key, data: newBoat });
+  return key;
+};
+
 module.exports = {
   getSingleBoat,
   getAllBoats,
@@ -91,4 +106,5 @@ module.exports = {
   addBoatLoad,
   deleteSingleBoat,
   removeBoatLoad,
+  putSingleBoat,
 };

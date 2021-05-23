@@ -61,6 +61,7 @@ const getUser = async (req, res, next) => {
 };
 
 const getTokenInfo = (req, res, next) => {
+  // return user_id and token_id for front end userinfo page
   res.status(200).json({
     id_token: req.session.id_token,
     id_user: req.session.id_user,

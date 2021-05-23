@@ -6,8 +6,8 @@ const { validateString, validateLength } = require("./validation");
 
 const validatePutReq = async (req, res, next) => {
   // if boat is not in database - return error
-  const boat = await getSingleBoat(req.params.id);
-  if (boat[0] === undefined) {
+  const boat = await getSingleBoat(req.params.boat_id);
+  if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
     return false;
   }
@@ -23,7 +23,7 @@ const validatePutReq = async (req, res, next) => {
   }
 
   // accept header must not be set or be set to application/json
-  const accepts = req.accepts(["*/*", "application/json"]);
+  const accepts = req.accepts("application/json");
   if (!accepts) {
     next(
       ApiError.notAcceptable("Accept header must be application/json if set")
@@ -62,25 +62,6 @@ const validatePutReq = async (req, res, next) => {
     return false;
   }
 
-  // boat name cannot be in currBoatNames
-  if (currBoatNames.includes(req.body.name)) {
-    next(
-      ApiError.forbidden("Object name attribute already exists in database")
-    );
-    return false;
-  }
-
-  // remove boat name from currBoatNames array
-  let newList = currBoatNames.filter((name) => {
-    if (name !== boat[0]["name"]) {
-      return name;
-    }
-  });
-  currBoatNames = [...newList];
-
-  // add name to currBoatNames
-  currBoatNames.push(req.body.name);
-
   // valid post request
   return true;
 };
@@ -88,7 +69,7 @@ const validatePutReq = async (req, res, next) => {
 const validatePatchReq = async (req, res, next) => {
   // if boat is not in database - return error
   const boat = await getSingleBoat(req.params.id);
-  if (boat[0] === undefined) {
+  if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
     return false;
   }
@@ -104,7 +85,7 @@ const validatePatchReq = async (req, res, next) => {
   }
 
   // accept header must not be set or be set to application/json
-  const accepts = req.accepts(["*/*", "application/json"]);
+  const accepts = req.accepts("application/json");
   if (!accepts) {
     next(
       ApiError.notAcceptable("Accept header must be application/json if set")
@@ -144,27 +125,6 @@ const validatePatchReq = async (req, res, next) => {
       ApiError.badRequest("Request object does not have correct attributes")
     );
     return false;
-  }
-
-  if (req.body.name) {
-    // boat name cannot be in currBoatNames
-    if (currBoatNames.includes(req.body.name)) {
-      next(
-        ApiError.forbidden("Object name attribute already exists in database")
-      );
-      return false;
-    }
-
-    // remove boat name from currBoatNames array
-    let newList = currBoatNames.filter((name) => {
-      if (name !== boat[0]["name"]) {
-        return name;
-      }
-    });
-    currBoatNames = [...newList];
-
-    // add name to currBoatNames
-    currBoatNames.push(req.body.name);
   }
 
   // valid post request

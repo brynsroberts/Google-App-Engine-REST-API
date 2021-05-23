@@ -8,10 +8,12 @@ const {
   assignLoadToBoat,
   removeLoadFromBoat,
   getAllLoadsForBoat,
+  putBoat,
 } = require("../controllers/boats");
 
 router.get("/", getBoats);
 router.get("/:boat_id", getBoat);
+router.put("/:boat_id", putBoat);
 router.put("/:boat_id/loads/:load_id", assignLoadToBoat);
 router.post("/", postBoat);
 router.delete("/:boat_id", deleteBoat);

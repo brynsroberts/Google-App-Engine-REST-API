@@ -26,8 +26,11 @@ function UserInfo(props) {
         <Row>
           <Col>
             <Card>
-              <Card.Header>JWT Bearer Token</Card.Header>
+              <Card.Header>JWT</Card.Header>
               <Card.Body>
+                <Card.Title>
+                  Use as bearer token for protected requests
+                </Card.Title>
                 <Card.Text>{id_token}</Card.Text>
               </Card.Body>
             </Card>

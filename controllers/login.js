@@ -25,8 +25,9 @@ const postUserToDatabase = async (tokens, req) => {
   // add token_id to session
   req.session.id_user = token_id;
 
+  // if token already in datastore - don't add user again
   let token_already_exists = false;
-  for (const user of existing_users.data) {
+  for (const user of existing_users.data.items) {
     if (user.token_id === token_id) {
       token_already_exists = true;
       break;
