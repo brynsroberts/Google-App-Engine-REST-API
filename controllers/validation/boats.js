@@ -68,7 +68,7 @@ const validatePutReq = async (req, res, next) => {
 
 const validatePatchReq = async (req, res, next) => {
   // if boat is not in database - return error
-  const boat = await getSingleBoat(req.params.id);
+  const boat = await getSingleBoat(req.params.boat_id);
   if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
     return false;

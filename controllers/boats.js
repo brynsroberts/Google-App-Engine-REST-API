@@ -29,6 +29,7 @@ const {
   validatedRemoveBoatLoad,
   validateDeleteReq,
   validatePutReq,
+  validatePatchReq,
 } = require("./validation/boats");
 const { authorizationExists, verifyToken } = require("./validation/token");
 
@@ -312,38 +313,51 @@ const putBoat = async (req, res, next) => {
 const patchBoat = async (req, res, next) => {
   // validate request
   const req_valid = await validatePatchReq(req, res, next);
+  if (!req_valid) return;
 
-  // if valid - post to database and return JSON object
-  if (req_valid) {
-    // update boat in database
-    const boat = await getSingleBoat(req.params.id);
-    let { name, type, length } = req.body;
+  // token cannot be undefined
+  if (!authorizationExists(req, next)) return;
 
-    // update variable to hold new user input or old values already stored in boat
-    if (!name) {
-      name = boat[0]["name"];
-    }
+  // authorize token
+  const token_id = await verifyToken(req, next);
+  if (!token_id) return;
 
-    if (!type) {
-      type = boat[0]["type"];
-    }
+  // update boat in database
+  const boat = await getSingleBoat(req.params.boat_id);
+  let { name, type, length } = req.body;
 
-    if (!length) {
-      length = boat[0]["length"];
-    }
-
-    // path boat with new values
-    const key = await putSingleBoat(name, type, length, req.params.id);
-
-    // send back 303 reponse with application/json
-    res.status(200).json({
-      id: key.id,
-      name: name,
-      type: type,
-      length: length,
-      self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + key.id,
-    });
+  // update variable to hold new user input or old values already stored in boat
+  if (!name) {
+    name = boat[0]["name"];
   }
+
+  if (!type) {
+    type = boat[0]["type"];
+  }
+
+  if (!length) {
+    length = boat[0]["length"];
+  }
+
+  // path boat with new values
+  const key = await putSingleBoat(name, type, length, req.params.boat_id);
+
+  // send back 303 reponse with application/json
+  res.status(200).json({
+    id: req.params.boat_id,
+    name: name,
+    type: type,
+    length: length,
+    owner: boat[0].owner,
+    loads: boat[0].loads,
+    self:
+      req.protocol +
+      "://" +
+      req.get("host") +
+      req.baseUrl +
+      "/" +
+      req.params.boat_id,
+  });
 };
 
 module.exports = {
