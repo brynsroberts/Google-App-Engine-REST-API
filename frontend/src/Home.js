@@ -8,6 +8,7 @@ function Home() {
         <Row>
           <Col className="center">
             <h1>Google App Engine REST API</h1>
+            <div class="g-signin2"></div>
           </Col>
         </Row>
       </Container>

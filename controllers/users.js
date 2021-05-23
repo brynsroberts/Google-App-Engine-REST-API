@@ -1,8 +1,16 @@
 const { getAllUsers, getSingleUser } = require("../models/users");
+const {
+  validateGetAllUsersReq,
+  validateGetReq,
+} = require("./validation/users");
 const ApiError = require("../error/error");
 const { Datastore } = require("@google-cloud/datastore");
 
 const getUsers = async (req, res, next) => {
+  // validate request
+  const valid_req = validateGetAllUsersReq(req, res, next);
+  if (!valid_req) return;
+
   // get all users from datastore
   const users = await getAllUsers();
 
@@ -15,10 +23,19 @@ const getUsers = async (req, res, next) => {
       self: req.protocol + "://" + req.get("host") + req.baseUrl + "/" + id,
     };
   });
-  res.status(200).json(formattedUsers);
+
+  // get user count
+  const user_count = formattedUsers.length;
+
+  // send json object back
+  res.status(200).json({ total_user_count: user_count, items: formattedUsers });
 };
 
 const getUser = async (req, res, next) => {
+  // validate request
+  const valid_req = await validateGetReq(req, res, next);
+  if (!valid_req) return;
+
   // get single user specified from /users/:user_id
   const user = await getSingleUser(req.params.user_id);
 

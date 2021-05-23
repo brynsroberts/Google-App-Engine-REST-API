@@ -260,7 +260,7 @@ const validateGetReq = async (req, res, next, token_id) => {
         "The request is either missing or has invalid JWT bearer token"
       )
     );
-    return;
+    return false;
   }
 
   // valid get boat request

@@ -1,6 +1,6 @@
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import google_sign_in from "../static/btn_google_signin_light_normal_web.png";
+import GoogleButton from "react-google-button";
 
 function Navigation() {
   return (
@@ -22,7 +22,9 @@ function Navigation() {
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
             <a href="http://localhost:8080/oauth">
-              <img src={google_sign_in} alt="Google Sign In Button" />
+              <GoogleButton
+                type="light" // can be light or dark
+              />
             </a>
           </Navbar.Text>
         </Navbar.Collapse>
