@@ -87,7 +87,7 @@ const getBoats = async (req, res, next) => {
   if (boats[1].moreResults !== Datastore.NO_MORE_RESULTS) {
     res.status(200).json({
       owner_boat_count: boat_count,
-      items: formattedBoats,
+      boats: formattedBoats,
       next:
         req.protocol +
         "://" +
@@ -101,7 +101,7 @@ const getBoats = async (req, res, next) => {
   } else {
     res
       .status(200)
-      .json({ owner_boat_count: boat_count, items: formattedBoats });
+      .json({ owner_boat_count: boat_count, boats: formattedBoats });
   }
 };
 

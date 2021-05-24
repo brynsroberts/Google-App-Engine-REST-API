@@ -66,7 +66,7 @@ const getLoads = async (req, res, next) => {
   if (loads[1].moreResults !== Datastore.NO_MORE_RESULTS) {
     res.status(200).json({
       total_load_count: load_count,
-      items: formattedLoads,
+      loads: formattedLoads,
       next:
         req.protocol +
         "://" +
@@ -80,7 +80,7 @@ const getLoads = async (req, res, next) => {
   } else {
     res
       .status(200)
-      .json({ total_load_count: load_count, items: formattedLoads });
+      .json({ total_load_count: load_count, loads: formattedLoads });
   }
 };
 

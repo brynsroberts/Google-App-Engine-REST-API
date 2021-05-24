@@ -84,4 +84,8 @@ const validateDate = (input) => {
   return true;
 };
 
-module.exports = { validateLength, validateString, validateDate };
+module.exports = {
+  validateLength,
+  validateString,
+  validateDate,
+};

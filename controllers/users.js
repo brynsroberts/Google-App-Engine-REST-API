@@ -28,7 +28,7 @@ const getUsers = async (req, res, next) => {
   const user_count = formattedUsers.length;
 
   // send json object back
-  res.status(200).json({ total_user_count: user_count, items: formattedUsers });
+  res.status(200).json({ total_user_count: user_count, users: formattedUsers });
 };
 
 const getUser = async (req, res, next) => {
