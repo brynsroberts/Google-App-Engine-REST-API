@@ -1,1 +1,12 @@
+body {
+  padding-bottom: 70px;
+}
 
+.title {
+  text-align: center;
+}
+
+.parent {
+  display: flex;
+  justify-content: center;
+}

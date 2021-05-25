@@ -1,4 +1,5 @@
 const { google } = require("googleapis");
+const { Datastore } = require("@google-cloud/datastore");
 const axios = require("axios").default;
 const { postSingleUser, getAllUsers } = require("../models/users");
 const { OAuth2Client } = require("google-auth-library");
@@ -27,17 +28,21 @@ const postUserToDatabase = async (tokens, req) => {
 
   // if token already in datastore - don't add user again
   let token_already_exists = false;
+  let user_id = "";
   for (const user of existing_users) {
     if (user.token_id === token_id) {
       token_already_exists = true;
+      user_id = user[Datastore.KEY].id;
       break;
     }
   }
 
   // if token is not in the database already - post to database
   if (!token_already_exists) {
-    await postSingleUser(token_id);
+    user_id = await postSingleUser(token_id);
   }
+
+  return user_id;
 };
 
 const oauthRedirect = async (req, res, next) => {
@@ -66,10 +71,15 @@ const oauthRedirect = async (req, res, next) => {
   req.session.id_token = tokens.id_token;
 
   // if user is not in database already - post user to database
-  await postUserToDatabase(tokens, req);
+  const datastore_id = await postUserToDatabase(tokens, req);
+
+  // add datastore self to session
+  const self =
+    req.protocol + "://" + req.get("host") + "/users/" + datastore_id;
+  req.session.self = self;
 
   // redirect to UserInfo page with id_token in params
-  const redirect_url = "http://localhost:8080/UserInfo/";
+  const redirect_url = "http://localhost:8080/authentication";
   res.redirect(redirect_url);
 };
 

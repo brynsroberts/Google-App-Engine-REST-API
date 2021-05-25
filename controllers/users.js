@@ -65,6 +65,7 @@ const getTokenInfo = (req, res, next) => {
   res.status(200).json({
     id_token: req.session.id_token,
     id_user: req.session.id_user,
+    self: req.session.self,
   });
 };
 
