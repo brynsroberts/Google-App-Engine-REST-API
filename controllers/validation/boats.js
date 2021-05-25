@@ -4,11 +4,23 @@ const { getSingleUser } = require("../../models/users");
 const { getSingleLoad } = require("../../models/loads");
 const { validateString, validateLength } = require("./validation");
 
-const validatePutReq = async (req, res, next) => {
+const validatePutReq = async (req, res, next, token_id) => {
   // if boat is not in database - return error
   const boat = await getSingleBoat(req.params.boat_id);
   if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
+    return false;
+  }
+
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
+      )
+    );
     return false;
   }
 
@@ -66,11 +78,23 @@ const validatePutReq = async (req, res, next) => {
   return true;
 };
 
-const validatePatchReq = async (req, res, next) => {
+const validatePatchReq = async (req, res, next, token_id) => {
   // if boat is not in database - return error
   const boat = await getSingleBoat(req.params.boat_id);
   if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
+    return false;
+  }
+
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
+      )
+    );
     return false;
   }
 
@@ -184,11 +208,23 @@ const validatePostReqBody = (req, res, next) => {
   return true;
 };
 
-const validateDeleteReq = async (req, res, next) => {
+const validateDeleteReq = async (req, res, next, token_id) => {
   // if boat is not in database - return error
   const boat = await getSingleBoat(req.params.boat_id);
   if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
+    return false;
+  }
+
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
+      )
+    );
     return false;
   }
 
@@ -204,7 +240,7 @@ const validateGetReq = async (req, res, next, token_id) => {
     return false;
   }
 
-  // if boat is not in databse - return error
+  // if boat is not in database - return error
   const boat = await getSingleBoat(req.params.boat_id);
   if (boat === undefined || boat[0] === undefined) {
     next(ApiError.notFound("No boat with this boat_id exists"));
@@ -241,13 +277,15 @@ const boatBelongsToOwner = async (boat, token_id) => {
   // if boat does not belong to owner - return false
   const owner_id = boat["owner"].split("/").pop();
   const owner = await getSingleUser(owner_id);
+  console.log(token_id);
+  console.log(owner[0]["token_id"]);
   if (owner[0]["token_id"] !== token_id) {
     return false;
   }
   return true;
 };
 
-const validatedLoadBoat = async (req, next) => {
+const validatedLoadBoat = async (req, next, token_id) => {
   // if boat does not exist - return error
   const boat_id = req.params.boat_id;
   const boat = await getSingleBoat(boat_id);
@@ -264,6 +302,18 @@ const validatedLoadBoat = async (req, next) => {
     return false;
   }
 
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
+      )
+    );
+    return false;
+  }
+
   // if load is already on a boat - return error
   if (load[0]["carrier"]["name"] !== null) {
     next(ApiError.forbidden("The load is already assigned to another boat"));
@@ -273,7 +323,7 @@ const validatedLoadBoat = async (req, next) => {
   return true;
 };
 
-const validatedRemoveBoatLoad = async (req, next) => {
+const validatedRemoveBoatLoad = async (req, next, token_id) => {
   // if boat does not exist - return error
   const boat_id = req.params.boat_id;
   const boat = await getSingleBoat(boat_id);
@@ -293,6 +343,18 @@ const validatedRemoveBoatLoad = async (req, next) => {
     next(
       ApiError.notFound(
         "No boat with this boat_id has a load with this load_id"
+      )
+    );
+    return false;
+  }
+
+  // if boat does not belong to owner - return an error
+  const owner_id = boat[0]["owner"].split("/").pop();
+  const owner = await getSingleUser(owner_id);
+  if (owner[0]["token_id"] !== token_id) {
+    next(
+      ApiError.unauthorized(
+        "The request is either missing or has invalid JWT bearer token"
       )
     );
     return false;

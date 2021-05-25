@@ -60,24 +60,35 @@ const getBoats = async (req, res, next) => {
     var cursor = req.query.cursor;
   }
 
-  // get all boats from datastore
-  const boats = await getAllBoats(cursor);
+  // get all users and find user with match token_id
+  const users = await getAllUsers();
+  const owner = users.filter((user) => {
+    if (user.token_id === token_id) {
+      return user;
+    }
+  });
+
+  // need owner_self to filter datastore results
+  const owner_id = owner[0][Datastore.KEY].id;
+  const owner_self =
+    req.protocol + "://" + req.get("host") + "/users/" + owner_id;
+
+  // get all boats from datastore that have correct owner self
+  const boats = await getAllBoats(cursor, owner_self);
 
   // get boats that belong to JTW owner and format boat for return
   const formattedBoats = boats[0].map((boat) => {
-    if (boatBelongsToOwner(boat, token_id)) {
-      return {
-        id: boat[Datastore.KEY].id,
-        ...boat,
-        self:
-          req.protocol +
-          "://" +
-          req.get("host") +
-          req.baseUrl +
-          "/" +
-          boat[Datastore.KEY].id,
-      };
-    }
+    return {
+      id: boat[Datastore.KEY].id,
+      ...boat,
+      self:
+        req.protocol +
+        "://" +
+        req.get("host") +
+        req.baseUrl +
+        "/" +
+        boat[Datastore.KEY].id,
+    };
   });
 
   // get total count for JWT user boats
@@ -185,16 +196,16 @@ const postBoat = async (req, res, next) => {
 };
 
 const deleteBoat = async (req, res, next) => {
-  // validate request
-  const valid_req = await validateDeleteReq(req, res, next);
-  if (!valid_req) return;
-
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
 
   // authorize token
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
+
+  // validate request
+  const valid_req = await validateDeleteReq(req, res, next, token_id);
+  if (!valid_req) return;
 
   // get boat id from params
   const boat_id = req.params.boat_id;
@@ -218,16 +229,16 @@ const deleteBoat = async (req, res, next) => {
 };
 
 const assignLoadToBoat = async (req, res, next) => {
-  // validate request
-  const valid_req = await validatedLoadBoat(req, next);
-  if (!valid_req) return;
-
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
 
   // authorize token
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
+
+  // validate request
+  const valid_req = await validatedLoadBoat(req, next, token_id);
+  if (!valid_req) return;
 
   // extract parameters from url
   const load_id = req.params.load_id;
@@ -248,16 +259,16 @@ const assignLoadToBoat = async (req, res, next) => {
 };
 
 const removeLoadFromBoat = async (req, res, next) => {
-  // validate request
-  const valid_req = await validatedRemoveBoatLoad(req, next);
-  if (!valid_req) return;
-
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
 
   // authorize token
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
+
+  // validate request
+  const valid_req = await validatedRemoveBoatLoad(req, next, token_id);
+  if (!valid_req) return;
 
   // extract parameters from url
   const boat_id = req.params.boat_id;
@@ -270,16 +281,16 @@ const removeLoadFromBoat = async (req, res, next) => {
 };
 
 const putBoat = async (req, res, next) => {
-  // validate request
-  const req_valid = await validatePutReq(req, res, next);
-  if (!req_valid) return;
-
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
 
   // authorize token
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
+
+  // validate request
+  const req_valid = await validatePutReq(req, res, next, token_id);
+  if (!req_valid) return;
 
   // update boat in database
   const { name, type, length } = req.body;
@@ -298,7 +309,7 @@ const putBoat = async (req, res, next) => {
   const put_boat = await getSingleBoat(req.params.boat_id);
   // send back 200 reponse with application/json
   res.status(200).json({
-    id: key.id,
+    id: req.params.boat_id,
     ...put_boat[0],
     self:
       req.protocol +
@@ -311,16 +322,16 @@ const putBoat = async (req, res, next) => {
 };
 
 const patchBoat = async (req, res, next) => {
-  // validate request
-  const req_valid = await validatePatchReq(req, res, next);
-  if (!req_valid) return;
-
   // token cannot be undefined
   if (!authorizationExists(req, next)) return;
 
   // authorize token
   const token_id = await verifyToken(req, next);
   if (!token_id) return;
+
+  // validate request
+  const req_valid = await validatePatchReq(req, res, next, token_id);
+  if (!req_valid) return;
 
   // update boat in database
   const boat = await getSingleBoat(req.params.boat_id);

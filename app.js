@@ -14,7 +14,6 @@ const loadRoutes = require("./routes/loads");
 // set up app
 const app = express();
 app.enable("trust proxy");
-// app.use(cors());
 app.use(express.json());
 app.use(
   session({
@@ -31,6 +30,7 @@ app.use("/boats", boatRoutes);
 app.use("/loads", loadRoutes);
 app.use("/", loginRoutes);
 
+// get React html page
 app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
 });

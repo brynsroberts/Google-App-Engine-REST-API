@@ -5,8 +5,11 @@ const datastore = new Datastore({ projectID: projectID });
 
 const BOAT = "Boat";
 
-const getAllBoats = async (cursor) => {
-  const query = datastore.createQuery(BOAT).limit(5);
+const getAllBoats = async (cursor, owner_self) => {
+  const query = datastore
+    .createQuery(BOAT)
+    .filter("owner", "=", owner_self)
+    .limit(5);
   if (cursor !== undefined) {
     query.start(cursor);
   }
