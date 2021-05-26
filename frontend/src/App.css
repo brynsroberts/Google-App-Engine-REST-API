@@ -2,6 +2,14 @@ body {
   padding-bottom: 70px;
 }
 
+.columnWidth {
+  width: 22%;
+}
+
+.content {
+  padding-top: 35px;
+}
+
 .title {
   text-align: center;
   text-decoration: underline;

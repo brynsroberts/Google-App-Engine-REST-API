@@ -11,7 +11,7 @@ function Navigation() {
       variant="light"
     >
       <Container>
-        <Navbar.Brand>CS493 Final Project</Navbar.Brand>
+        <Navbar.Brand>Google App Engine REST API</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse className="justify-content-end">
           <Nav>

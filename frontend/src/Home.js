@@ -1,17 +1,27 @@
 import { Container, Row, Col } from "react-bootstrap";
-import Entities from "./components/Entities";
+import Users from "./components/Users";
+import Boats from "./components/Boats";
+import Loads from "./components/Loads";
+import Relationship from "./components/Relationships";
 import "./App.css";
 
 function Home() {
   return (
     <div className="App">
-      <Container>
+      <Container className="content">
         <Row>
-          <Col className="center">
+          <Col>
+            <h1 className="title">
+              CS493 Cloud Application Development - Final Project
+            </h1>
             <br></br>
-            <h1 className="title">Google App Engine REST API</h1>
+            <Users />
             <br></br>
-            <Entities />
+            <Boats />
+            <br></br>
+            <Loads />
+            <br></br>
+            <Relationship />
           </Col>
         </Row>
       </Container>
