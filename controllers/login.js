@@ -79,7 +79,8 @@ const oauthRedirect = async (req, res, next) => {
   req.session.self = self;
 
   // redirect to UserInfo page with id_token in params
-  const redirect_url = "http://localhost:8080/authentication";
+  const redirect_url =
+    "https://robertb2-finalproject.wl.r.appspot.com/authentication";
   res.redirect(redirect_url);
 };
 

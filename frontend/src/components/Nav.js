@@ -24,6 +24,18 @@ function Navigation() {
               Authentication
             </Link>
           </Nav>
+          <Nav>
+            <Link
+              className="nav-link"
+              to={{
+                pathname: "https://github.com/brynsroberts/cs493-finalproject",
+              }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </Link>
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>

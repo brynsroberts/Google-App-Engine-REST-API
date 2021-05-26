@@ -11,12 +11,11 @@ function Authentication(props) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/users/token/info")
+      .get("https://robertb2-finalproject.wl.r.appspot.com/users/token/info")
       .then((res) => {
         setIdToken(res.data.id_token);
         setIDUser(res.data.id_user);
         setSelf(res.data.self);
-        console.log(id_token);
       })
       .catch(() => {
         console.log("error");

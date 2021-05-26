@@ -4,6 +4,7 @@ body {
 
 .title {
   text-align: center;
+  text-decoration: underline;
 }
 
 .parent {
