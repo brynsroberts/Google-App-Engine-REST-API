@@ -12,11 +12,11 @@ function Home() {
     <div className="App">
       <Container className="content">
         <Row>
-          <Col xs={2}>
+          <Col md={2} className="d-none d-md-block">
             <br></br>
             <SideNav />
           </Col>
-          <Col className="anchor">
+          <Col className="anchor" sm={12} md={10}>
             <br></br>
             <h1 className="title">
               CS493 Cloud Application Development - Final Project
