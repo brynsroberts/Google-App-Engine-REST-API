@@ -7,8 +7,8 @@ function Navigation() {
       collapseOnSelect
       className="sticky-top"
       expand="sm"
-      bg="light"
-      variant="light"
+      bg="primary"
+      variant="dark"
     >
       <Container>
         <Navbar.Brand>Google App Engine REST API</Navbar.Brand>

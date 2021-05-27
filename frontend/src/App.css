@@ -6,13 +6,18 @@ body {
   width: 22%;
 }
 
-.content {
-  padding-top: 35px;
+.anchor {
+  margin-top: -200px;
+  padding-top: 200px;
 }
 
 .title {
   text-align: center;
   text-decoration: underline;
+}
+
+.sideNav {
+  position: fixed;
 }
 
 .parent {

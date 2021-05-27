@@ -1,4 +1,6 @@
 import { Container, Row, Col } from "react-bootstrap";
+import SideNav from "./components/SideNav";
+import Introduction from "./components/Introduction";
 import Users from "./components/Users";
 import Boats from "./components/Boats";
 import Loads from "./components/Loads";
@@ -10,17 +12,24 @@ function Home() {
     <div className="App">
       <Container className="content">
         <Row>
-          <Col>
+          <Col xs={2}>
+            <br></br>
+            <SideNav />
+          </Col>
+          <Col className="anchor">
+            <br></br>
             <h1 className="title">
               CS493 Cloud Application Development - Final Project
             </h1>
-            <br></br>
+            <br id="introduction"></br>
+            <Introduction />
+            <br id="users"></br>
             <Users />
-            <br></br>
+            <br id="boats"></br>
             <Boats />
-            <br></br>
+            <br id="loads"></br>
             <Loads />
-            <br></br>
+            <br id="relationships"></br>
             <Relationship />
           </Col>
         </Row>
