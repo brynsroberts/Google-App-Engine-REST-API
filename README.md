@@ -4,11 +4,11 @@ Implements a REST API that uses proper resource based URLs, pagination and statu
 
 ## URL
 
-    https://robertb2-finalproject.wl.r.appspot.com/
+    https://robertb2-restapi.wl.r.appspot.com/
 
 ## Authentication
 
-    https://robertb2-finalproject.wl.r.appspot.com/authentication
+    https://robertb2-restapi.wl.r.appspot.com/authentication
 
 ## Sources
 
