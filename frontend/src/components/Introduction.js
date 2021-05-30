@@ -17,7 +17,7 @@ function Description() {
           collection and environemt to test API functionality.
         </p>
         <h4>REST API Base URL</h4>
-        <p>https://robertb2-finalproject.wl.r.appspot.com</p>
+        <p>https://robertb2-restapi.wl.r.appspot.com</p>
       </Card.Body>
     </Card>
   );
