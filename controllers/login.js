@@ -80,7 +80,7 @@ const oauthRedirect = async (req, res, next) => {
 
   // redirect to UserInfo page with id_token in params
   const redirect_url =
-    "https://robertb2-finalproject.wl.r.appspot.com/authentication";
+    "https://robertb2-restapi.wl.r.appspot.com/authentication";
   res.redirect(redirect_url);
 };
 
