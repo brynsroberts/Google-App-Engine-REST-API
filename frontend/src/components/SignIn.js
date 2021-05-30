@@ -17,7 +17,7 @@ function SignIn(props) {
             <div className="parent">
               <a
                 className="justify-content-center"
-                href="https://robertb2-finalproject.wl.r.appspot.com/oauth"
+                href="https://robertb2-restapi.wl.r.appspot.com/oauth"
               >
                 <GoogleButton
                   className="text-center"
