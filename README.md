@@ -9,6 +9,10 @@ Implements a REST API that uses proper resource based URLs, pagination and statu
 ## Authentication
 
     https://robertb2-restapi.wl.r.appspot.com/authentication
+    
+## Documentation
+
+    robertb2_project.pdf
 
 ## Sources
 
