@@ -18,6 +18,6 @@ Implements a REST API that uses proper resource based URLs, pagination and statu
 
 - CS493 - Cloud Application Development Final Project
 
-## Authors
+## Author
 
 - Bryan Roberts
