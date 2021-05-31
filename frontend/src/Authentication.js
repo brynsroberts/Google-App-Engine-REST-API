@@ -11,7 +11,7 @@ function Authentication(props) {
 
   useEffect(() => {
     axios
-      .get("https://robertb2-restapi.wl.r.appspot.com/users/token/info")
+      .get("https://robertb2-finalproject.wl.r.appspot.com/users/token/info")
       .then((res) => {
         setIdToken(res.data.id_token);
         setIDUser(res.data.id_user);
