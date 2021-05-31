@@ -14,10 +14,10 @@ function Description() {
           back-end. Application is deployed on Google Cloud Platform using
           Google App Engine and Google Cloud Datastore NoSQL database. All code
           can be found in the linked GitHub repository along with a Postman
-          collection and environemt to test API functionality.
+          collection and environment to test API functionality.
         </p>
         <h4>REST API Base URL</h4>
-        <p>https://robertb2-restapi.wl.r.appspot.com</p>
+        <p>https://robertb2-finalproject.wl.r.appspot.com</p>
       </Card.Body>
     </Card>
   );
